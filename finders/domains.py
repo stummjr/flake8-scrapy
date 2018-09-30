@@ -4,6 +4,22 @@ from six.moves.urllib.parse import urlparse
 from finders import IssueFinder
 
 
+def get_list_metadata(node):
+    return [
+        (subnode.lineno, subnode.col_offset, subnode.s)
+        for subnode in node.value.elts
+        if isinstance(subnode, ast.Str)
+    ]
+
+
+def is_list_assignment(node, var_name):
+    return (
+        isinstance(node.targets[0], ast.Name) and
+        isinstance(node.value, (ast.List, ast.Tuple)) and
+        node.targets[0].id == var_name
+    )
+
+
 class UnreachableDomainIssueFinder(IssueFinder):
     msg_code = 'SCP01'
     msg_info = "allowed_domains doesn't allow this URL from start_urls"
@@ -13,20 +29,6 @@ class UnreachableDomainIssueFinder(IssueFinder):
         self.allowed_domains = []
         self.start_urls = []
 
-    def get_list_metadata(self, node):
-        return [
-            (subnode.lineno, subnode.col_offset, subnode.s)
-            for subnode in node.value.elts
-            if isinstance(subnode, ast.Str)
-        ]
-
-    def is_list_assignment(self, node, var_name):
-        return (
-            isinstance(node.targets[0], ast.Name) and
-            isinstance(node.value, (ast.List, ast.Tuple)) and
-            node.targets[0].id == var_name
-        )
-
     def url_in_allowed_domains(self, url):
         netloc = urlparse(url).netloc
         return any(
@@ -35,11 +37,11 @@ class UnreachableDomainIssueFinder(IssueFinder):
         )
 
     def find_issues(self, node):
-        if self.is_list_assignment(node, var_name='allowed_domains'):
-            self.allowed_domains = self.get_list_metadata(node)
+        if is_list_assignment(node, var_name='allowed_domains'):
+            self.allowed_domains = get_list_metadata(node)
 
-        if self.is_list_assignment(node, var_name='start_urls'):
-            self.start_urls = self.get_list_metadata(node)
+        if is_list_assignment(node, var_name='start_urls'):
+            self.start_urls = get_list_metadata(node)
 
         if not all((self.allowed_domains, self.start_urls)):
             return
@@ -47,3 +49,27 @@ class UnreachableDomainIssueFinder(IssueFinder):
         for line, col, url in self.start_urls:
             if not self.url_in_allowed_domains(url):
                 yield (line, col, self.message)
+
+
+class UrlInAllowedDomainsIssueFinder(IssueFinder):
+    msg_code = 'SCP02'
+    msg_info = 'allowed_domains should not contain URLs'
+
+    def is_not_raw_domain(self, domain):
+        # when it's just a domain (as 'example.com'), the parsed URL contains
+        # only the 'path' component
+        forbidden_components = [
+            'scheme', 'netloc', 'params', 'query', 'fragment',
+        ]
+        parts = urlparse(domain)
+        return not any(
+            getattr(parts, comp, None) for comp in forbidden_components
+        )
+
+    def find_issues(self, node):
+        if is_list_assignment(node, var_name='allowed_domains'):
+            allowed_domains = get_list_metadata(node)
+
+            for line, col, url in allowed_domains:
+                if not self.is_not_raw_domain(url):
+                    yield (line, col, self.message)

@@ -1,7 +1,8 @@
 import ast
-from six.moves.urllib.parse import urlparse
 
-from finders.domains import UnreachableDomainIssueFinder
+from finders.domains import (
+    UnreachableDomainIssueFinder, UrlInAllowedDomainsIssueFinder,
+)
 
 
 __version__ = '0.0.1'
@@ -14,6 +15,7 @@ class ScrapyStyleIssueFinder(ast.NodeVisitor):
         self.issues = []
         self.finders = [
             UnreachableDomainIssueFinder(),
+            UrlInAllowedDomainsIssueFinder(),
         ]
 
     def visit_Assign(self, node):
