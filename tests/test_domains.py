@@ -44,7 +44,6 @@ def test_url_in_allowed_domains():
     issues = run_checker(code)
 
     assert len(issues) == 1
-    # first issue
     assert issues[0][0] == 10  # line
     assert issues[0][1] == 8   # col
     assert UrlInAllowedDomainsIssueFinder.msg_code in issues[0][2]

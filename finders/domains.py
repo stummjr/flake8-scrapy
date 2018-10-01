@@ -55,14 +55,14 @@ class UrlInAllowedDomainsIssueFinder(IssueFinder):
     msg_code = 'SCP02'
     msg_info = 'allowed_domains should not contain URLs'
 
-    def is_not_raw_domain(self, domain):
+    def is_url(self, domain):
         # when it's just a domain (as 'example.com'), the parsed URL contains
         # only the 'path' component
         forbidden_components = [
             'scheme', 'netloc', 'params', 'query', 'fragment',
         ]
         parts = urlparse(domain)
-        return not any(
+        return any(
             getattr(parts, comp, None) for comp in forbidden_components
         )
 
@@ -71,5 +71,5 @@ class UrlInAllowedDomainsIssueFinder(IssueFinder):
             allowed_domains = get_list_metadata(node)
 
             for line, col, url in allowed_domains:
-                if not self.is_not_raw_domain(url):
+                if self.is_url(url):
                     yield (line, col, self.message)
