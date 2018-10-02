@@ -8,12 +8,7 @@ class UrlJoinIssueFinder(IssueFinder):
     msg_info = 'urljoin(response.url, "/foo") can be replaced by response.urljoin("/foo")'
 
     def find_issues(self, node):
-        doesnt_apply = (
-            not isinstance(node.func, ast.Name) or
-            node.func.id != 'urljoin' or
-            not node.args
-        )
-        if doesnt_apply:
+        if not self.issue_applies(node):
             return
 
         first_param = node.args[0]
@@ -23,3 +18,10 @@ class UrlJoinIssueFinder(IssueFinder):
         if first_param.value.id == 'response' and first_param.attr == 'url':
             # found it: first param to urljoin is response.url
             yield (node.lineno, node.col_offset, self.message)
+
+    def issue_applies(self, node):
+        return (
+            isinstance(node.func, ast.Name) and
+            node.func.id == 'urljoin' and
+            node.args
+        )
