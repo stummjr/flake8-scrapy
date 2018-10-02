@@ -6,6 +6,7 @@ from . import run_checker
     ('response.urljoin("/foo")', 0, ''),
     ('urljoin(response.url, "/foo")', 1, 'SCP03'),
     ('url = urljoin(response.url, "/foo")', 1, 'SCP03'),
+    ('url = urljoin()', 0, ''),
 ])
 def test_has_old_urljoin(code, expected, issue_code):
     issues = run_checker(code)

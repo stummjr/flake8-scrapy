@@ -8,7 +8,12 @@ class UrlJoinIssueFinder(IssueFinder):
     msg_info = 'urljoin(response.url, "/foo") can be replaced by response.urljoin("/foo")'
 
     def find_issues(self, node):
-        if not isinstance(node.func, ast.Name) or node.func.id != 'urljoin':
+        doesnt_apply = (
+            not isinstance(node.func, ast.Name) or
+            node.func.id != 'urljoin' or
+            not node.args
+        )
+        if doesnt_apply:
             return
 
         first_param = node.args[0]
