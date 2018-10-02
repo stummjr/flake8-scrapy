@@ -3,6 +3,7 @@ import ast
 from finders.domains import (
     UnreachableDomainIssueFinder, UrlInAllowedDomainsIssueFinder,
 )
+from finders.oldstyle import UrlJoinIssueFinder
 
 
 __version__ = '0.0.1'
@@ -13,16 +14,29 @@ class ScrapyStyleIssueFinder(ast.NodeVisitor):
     def __init__(self, *args, **kwargs):
         super(ScrapyStyleIssueFinder, self).__init__(*args, **kwargs)
         self.issues = []
-        self.finders = [
-            UnreachableDomainIssueFinder(),
-            UrlInAllowedDomainsIssueFinder(),
-        ]
+        self.finders = {
+            'Assign': [
+                UnreachableDomainIssueFinder(),
+                UrlInAllowedDomainsIssueFinder(),
+            ],
+            'Call': [
+                UrlJoinIssueFinder(),
+            ]
+        }
 
     def visit_Assign(self, node):
-        for finder in self.finders:
+        for finder in self.finders['Assign']:
             issues = finder.find_issues(node)
             if issues:
                 self.issues.extend(list(issues))
+        self.generic_visit(node)
+
+    def visit_Call(self, node):
+        for finder in self.finders['Call']:
+            issues = finder.find_issues(node)
+            if issues:
+                self.issues.extend(list(issues))
+        self.generic_visit(node)
 
 
 class ScrapyStyleChecker(object):

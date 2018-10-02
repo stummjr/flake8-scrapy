@@ -1,25 +1,7 @@
-import ast
-import os
-
-from flake8_scrapy import ScrapyStyleChecker
+from . import load_sample_file, run_checker
 from finders.domains import (
     UnreachableDomainIssueFinder, UrlInAllowedDomainsIssueFinder,
 )
-
-
-def load_sample_file(filename):
-    path = os.path.join(
-        os.path.dirname(__file__),
-        'samples',
-        filename
-    )
-    return open(path).read()
-
-
-def run_checker(code):
-    tree = ast.parse(code)
-    checker = ScrapyStyleChecker(tree, None)
-    return list(checker.run())
 
 
 def test_url_not_in_allowed_domains():
