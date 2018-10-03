@@ -25,3 +25,60 @@ class UrlJoinIssueFinder(IssueFinder):
             node.func.id == 'urljoin' and
             node.args
         )
+
+
+class OldSelectorIssueFinder(IssueFinder):
+    msg_code = 'SCP04'
+    msg_info = 'manually instantiating a Selector object'
+
+    def is_response_dot_body_as_unicode(self, node):
+        """ Returns True if node represents `response.body_as_unicode()`
+        """
+        return (
+            isinstance(node, ast.Call) and
+            isinstance(node.func, ast.Attribute) and
+            node.func.value.id == 'response' and
+            node.func.attr == 'body_as_unicode'
+        )
+
+    def is_response_dot_text_or_body(self, node):
+        """ Return whether or not a node represents `response.text` or
+            `response.body`
+        """
+        return (
+            isinstance(node, ast.Attribute) and
+            node.value.id == 'response' and
+            node.attr in ('text', 'body')
+        )
+
+    def issue_applies(self, node):
+        return (
+            isinstance(node.value, ast.Call) and
+            isinstance(node.value.func, ast.Name) and
+            node.value.func.id == 'Selector'
+        )
+
+    def find_issues(self, node):
+        if not self.issue_applies(node):
+            return
+
+        found_issue = False
+        if node.value.args:
+            param = node.value.args[0]
+            found_issue = (
+                self.is_response_dot_body_as_unicode(param) or
+                self.is_response_dot_text_or_body(param)
+            )
+
+        # look for sel = Selector(text=response.text)
+        for kw in node.value.keywords:
+            found_issue = (
+                kw.arg == 'text' and
+                self.is_response_dot_text_or_body(kw.value) or
+                self.is_response_dot_body_as_unicode(kw.value)
+            )
+            if found_issue:
+                break
+
+        if found_issue:
+            yield (node.lineno, node.col_offset, self.message)
