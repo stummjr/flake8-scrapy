@@ -24,19 +24,20 @@ class ScrapyStyleIssueFinder(ast.NodeVisitor):
             ]
         }
 
-    def visit_Assign(self, node):
-        for finder in self.finders['Assign']:
+    def find_issues_visitor(self, visitor, node):
+        """Find issues for the provided visitor
+        """
+        for finder in self.finders[visitor]:
             issues = finder.find_issues(node)
             if issues:
                 self.issues.extend(list(issues))
         self.generic_visit(node)
 
+    def visit_Assign(self, node):
+        self.find_issues_visitor('Assign', node)
+
     def visit_Call(self, node):
-        for finder in self.finders['Call']:
-            issues = finder.find_issues(node)
-            if issues:
-                self.issues.extend(list(issues))
-        self.generic_visit(node)
+        self.find_issues_visitor('Call', node)
 
 
 class ScrapyStyleChecker(object):
