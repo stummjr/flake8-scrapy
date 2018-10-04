@@ -29,7 +29,7 @@ class UrlJoinIssueFinder(IssueFinder):
 
 class OldSelectorIssueFinder(IssueFinder):
     msg_code = 'SCP04'
-    msg_info = 'manually instantiating a Selector object'
+    msg_info = 'use response.selector or response.xpath or response.css instead'
 
     def is_response_dot_body_as_unicode(self, node):
         """ Returns True if node represents `response.body_as_unicode()`
