@@ -29,6 +29,7 @@ def test_dont_find_old_style_urljoin(code):
     ('sel = Selector(response.body_as_unicode())', 1),
     ('sel = Selector(text=response.text)', 1),
     ('sel = Selector(text=response.body_as_unicode())', 1),
+    ('sel = Selector(response.text, type="html")', 1),
     ('sel = Selector(get_text())', 0),
     ('sel = Selector(self.get_text())', 0),
 ])

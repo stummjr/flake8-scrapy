@@ -62,13 +62,14 @@ class OldSelectorIssueFinder(IssueFinder):
         if not self.issue_applies(node):
             return
 
-        found_issue = False
         if node.value.args:
             param = node.value.args[0]
             found_issue = (
                 self.is_response_dot_body_as_unicode(param) or
                 self.is_response_dot_text_or_body(param)
             )
+            if found_issue:
+                return [(node.lineno, node.col_offset, self.message)]
 
         # look for sel = Selector(text=response.text)
         for kw in node.value.keywords:
@@ -78,7 +79,4 @@ class OldSelectorIssueFinder(IssueFinder):
                 self.is_response_dot_body_as_unicode(kw.value)
             )
             if found_issue:
-                break
-
-        if found_issue:
-            yield (node.lineno, node.col_offset, self.message)
+                return [(node.lineno, node.col_offset, self.message)]
