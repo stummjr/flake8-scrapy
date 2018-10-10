@@ -32,7 +32,7 @@ class OldSelectorIssueFinder(IssueFinder):
     msg_info = 'use response.selector or response.xpath or response.css instead'
 
     def is_response_dot_body_as_unicode(self, node):
-        """ Returns True if node represents `response.body_as_unicode()`
+        """ Returns True if node represents response.body_as_unicode()
         """
         return (
             isinstance(node, ast.Call) and
@@ -42,8 +42,8 @@ class OldSelectorIssueFinder(IssueFinder):
         )
 
     def is_response_dot_text_or_body(self, node):
-        """ Return whether or not a node represents `response.text` or
-            `response.body`
+        """ Return whether or not a node represents response.text or
+            response.body
         """
         return (
             isinstance(node, ast.Attribute) and
@@ -52,7 +52,7 @@ class OldSelectorIssueFinder(IssueFinder):
         )
 
     def is_response(self, node):
-        """ Check if node represents an object named as `response`
+        """ Check if node represents an object named as response
         """
         return (
             isinstance(node, ast.Name) and
