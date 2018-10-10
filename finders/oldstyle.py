@@ -51,6 +51,29 @@ class OldSelectorIssueFinder(IssueFinder):
             node.attr in ('text', 'body')
         )
 
+    def is_response(self, node):
+        """ Check if node represents an object named as `response`
+        """
+        return (
+            isinstance(node, ast.Name) and
+            node.id == 'response'
+        )
+
+    def has_response_for_keyword_parameter(self, node):
+        """ Check if response or response.text is passed as a keyword parameter
+            as in: Selector(text=response.text) or Selector(response=response)
+        """
+        return (
+            (
+                node.arg == 'text' and
+                self.is_response_dot_text_or_body(node.value) or
+                self.is_response_dot_body_as_unicode(node.value)
+            ) or (
+                node.arg == 'response' and
+                self.is_response(node.value)
+            )
+        )
+
     def issue_applies(self, node):
         return (
             isinstance(node.value, ast.Call) and
@@ -62,21 +85,13 @@ class OldSelectorIssueFinder(IssueFinder):
         if not self.issue_applies(node):
             return
 
+        # look for: Selector(response)
         if node.value.args:
             param = node.value.args[0]
-            found_issue = (
-                self.is_response_dot_body_as_unicode(param) or
-                self.is_response_dot_text_or_body(param)
-            )
-            if found_issue:
+            if self.is_response(param):
                 return [(node.lineno, node.col_offset, self.message)]
 
-        # look for sel = Selector(text=response.text)
+        # look for: Selector(response=response) or Selector(text=response.text)
         for kw in node.value.keywords:
-            found_issue = (
-                kw.arg == 'text' and
-                self.is_response_dot_text_or_body(kw.value) or
-                self.is_response_dot_body_as_unicode(kw.value)
-            )
-            if found_issue:
+            if self.has_response_for_keyword_parameter(kw):
                 return [(node.lineno, node.col_offset, self.message)]
