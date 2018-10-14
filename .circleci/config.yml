@@ -24,3 +24,8 @@ jobs:
           command: |
             . venv/bin/activate
             tox
+      - run:
+          name: check coverage
+          command: |
+            . venv/bin/activate
+            pytest --cov=. --cov-fail-under=95
