@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/python:3.6.1
+      - image: themattrix/tox
     working_directory: ~/repo
     steps:
       - checkout
@@ -11,6 +11,7 @@ jobs:
           command: |
             python3 -m venv venv
             . venv/bin/activate
+            pip install -U setuptools pip
             pip install -r requirements.txt
             pip install -r requirements-dev.txt
       - run:
@@ -22,4 +23,9 @@ jobs:
           name: run tests
           command: |
             . venv/bin/activate
-            pytest
+            tox
+      - run:
+          name: check coverage
+          command: |
+            . venv/bin/activate
+            pytest --cov=. --cov-fail-under=95

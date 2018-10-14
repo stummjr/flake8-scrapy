@@ -25,7 +25,7 @@ class UnreachableDomainIssueFinder(IssueFinder):
     msg_info = "allowed_domains doesn't allow this URL from start_urls"
 
     def __init__(self, *args, **kwargs):
-        super(UnreachableDomainIssueFinder, self).__init__(*args, *kwargs)
+        super(UnreachableDomainIssueFinder, self).__init__(*args, **kwargs)
         self.allowed_domains = []
         self.start_urls = []
 
