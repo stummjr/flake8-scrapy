@@ -38,3 +38,16 @@ def test_dont_find_old_style_urljoin(code):
 def test_find_old_style_selector(code, expected):
     issues = run_checker(code)
     assert len(issues) == expected
+
+
+@pytest.mark.parametrize('code,expected', [
+    ('response.css("*")[0].extract()', 1),
+    ('response.xpath("//*")[0].extract()', 1),
+    # ('response.css("*").extract()[0]', 1),
+    # ('response.xpath("//*").extract()[0]', 1),
+    # ('response.css("*").getall()[0]', 1),
+    # ('response.xpath("//*")[0].get()', 1),
+])
+def test_find_oldstyle_get_first_by_index(code, expected):
+    issues = run_checker(code)
+    assert len(issues) == expected

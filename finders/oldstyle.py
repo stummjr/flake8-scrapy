@@ -95,3 +95,22 @@ class OldSelectorIssueFinder(IssueFinder):
         for kw in node.value.keywords:
             if self.has_response_for_keyword_parameter(kw):
                 return [(node.lineno, node.col_offset, self.message)]
+
+
+class GetFirstByIndexIssueFinder(IssueFinder):
+    msg_code = 'SCP06'
+    msg_info = 'use .get() or .extract_first() to get the first item'
+
+    def find_issues(self, node):
+        issue_exists = (
+            node.slice.value.n == 0 and
+            isinstance(node.value, ast.Call) and
+            isinstance(node.value.func, ast.Attribute) and
+            node.value.func.attr == 'extract' and
+            node.value.func.attr in ('css', 'xpath')
+        )
+        if not issue_exists:
+            return
+
+        return [(node.lineno, node.col_offset, self.message)]
+
