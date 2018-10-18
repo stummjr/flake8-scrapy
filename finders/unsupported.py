@@ -30,13 +30,11 @@ class LambdaCallbackIssueFinder(IssueFinder):
         if not self.issue_applies(node):
             return
 
-        # if more than 2 positional args, callback is the 2nd one
         if len(node.args) >= 2:
             callback = node.args[1]
             if isinstance(callback, ast.Lambda):
                 return [(callback.lineno, callback.col_offset, self.message)]
 
-        # if keyword arguments, check the callback one
         for kw in node.keywords:
             if kw.arg == 'callback' and isinstance(kw.value, ast.Lambda):
                 return [(node.lineno, node.col_offset, self.message)]
