@@ -14,3 +14,26 @@ A Flake8 plugin to catch common issues on Scrapy spiders.
 | SCP04 | Usage of `Selector(response)` in callback |
 
 This is a work in progress, so new issues will be added to this list.
+
+
+## Installation
+
+To run this in your project, please make sure you have flake8 installed first:
+
+```
+$ pip install flake8
+```
+
+And then install flake8-scrapy:
+
+```
+$ pip install flake8-scrapy
+```
+
+Now, all you have to do is run it on your project:
+
+```
+$ flake8
+```
+
+And Flake8 will run the checks defined in this plugin.
