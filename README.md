@@ -1,4 +1,6 @@
 # scrapy-flake8
+![](https://github.com/stummjr/flake8-scrapy/workflows/CI/badge.svg)
+[![Downloads](https://pepy.tech/badge/flake8-scrapy)](https://pepy.tech/project/scrapy-fieldstats)
 
 A Flake8 plugin to catch common issues on Scrapy spiders.
 
