@@ -3,7 +3,9 @@ import ast
 from finders.domains import (
     UnreachableDomainIssueFinder, UrlInAllowedDomainsIssueFinder,
 )
-from finders.oldstyle import OldSelectorIssueFinder, UrlJoinIssueFinder
+from finders.oldstyle import (
+    GetFirstByIndexIssueFinder, OldSelectorIssueFinder, UrlJoinIssueFinder,
+)
 
 
 __version__ = '0.0.1'
@@ -22,7 +24,10 @@ class ScrapyStyleIssueFinder(ast.NodeVisitor):
             ],
             'Call': [
                 UrlJoinIssueFinder(),
-            ]
+            ],
+            'Subscript': [
+                GetFirstByIndexIssueFinder(),
+            ],
         }
 
     def find_issues_visitor(self, visitor, node):
@@ -39,6 +44,9 @@ class ScrapyStyleIssueFinder(ast.NodeVisitor):
 
     def visit_Call(self, node):
         self.find_issues_visitor('Call', node)
+
+    def visit_Subscript(self, node):
+        self.find_issues_visitor('Subscript', node)
 
 
 class ScrapyStyleChecker(object):
