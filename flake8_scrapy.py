@@ -6,7 +6,7 @@ from finders.domains import (
 from finders.oldstyle import OldSelectorIssueFinder, UrlJoinIssueFinder
 
 
-__version__ = '0.0.1'
+__version__ = '0.0.2'
 
 
 class ScrapyStyleIssueFinder(ast.NodeVisitor):

@@ -7,7 +7,7 @@ with open('README.md', 'r') as f:
 setuptools.setup(
     name='flake8-scrapy',
     license='MIT',
-    version='0.0.1',
+    version='0.0.2',
     long_description=long_description,
     long_description_content_type='text/markdown',
     author='Valdir Stumm Junior',
