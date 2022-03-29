@@ -12,7 +12,7 @@ class UrlJoinIssueFinder(IssueFinder):
             return
 
         first_param = node.args[0]
-        if not isinstance(first_param, ast.Attribute):
+        if not isinstance(first_param, ast.Attribute) or not isinstance(first_param.value, ast.Name):
             return
 
         if first_param.value.id == 'response' and first_param.attr == 'url':
