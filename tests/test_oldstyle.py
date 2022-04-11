@@ -17,6 +17,8 @@ def test_finds_old_style_urljoin(code):
 @pytest.mark.parametrize('code', [
     ('response.urljoin("/foo")'),
     ('url = urljoin()'),
+    ('urljoin(x, "/foo")'),
+    ('urljoin(x.y.z, "/foo")'),
 ])
 def test_dont_find_old_style_urljoin(code):
     issues = run_checker(code)
