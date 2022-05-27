@@ -4,7 +4,7 @@ from finders.domains import (
     UnreachableDomainIssueFinder, UrlInAllowedDomainsIssueFinder,
 )
 from finders.oldstyle import OldSelectorIssueFinder, UrlJoinIssueFinder
-
+from finders.unsupported import LambdaCallbackIssueFinder
 
 __version__ = '0.0.2'
 
@@ -22,6 +22,7 @@ class ScrapyStyleIssueFinder(ast.NodeVisitor):
             ],
             'Call': [
                 UrlJoinIssueFinder(),
+                LambdaCallbackIssueFinder(),
             ]
         }
 

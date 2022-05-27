@@ -12,6 +12,7 @@ A Flake8 plugin to catch common issues on Scrapy spiders.
 | SCP02 | There are URLs in `allowed_domains` |
 | SCP03 | Usage of `urljoin(response.url, '/foo')` instead of `response.urljoin('/foo')` |
 | SCP04 | Usage of `Selector(response)` in callback |
+| SCP05 | Usage of a lambda function as the request callback |
 
 This is a work in progress, so new issues will be added to this list.
 
